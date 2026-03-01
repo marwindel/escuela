@@ -1,5 +1,4 @@
 from datetime import datetime
-
 import customtkinter as ctk
 #from customtkinter import messagebox
 import tkinter as tk
@@ -7,6 +6,7 @@ from tkinter import ttk
 from tkinter import messagebox
 from escuela.cliente_dao import ClienteDAO
 from escuela.materiales import Materiales
+from aula_gui_custom import AppAula
 import ctypes 
 
 try:
@@ -164,7 +164,7 @@ class App(ctk.CTk, tk.Tk):
         self.frame_aula.grid_rowconfigure(0, weight=1)
 
         # 3. Crear el botón y colocarlo en la posición (0,0)
-        boton_central = ctk.CTkButton(self.frame_aula, text="Registar Aulas", width=250, height=50, fg_color="#355872", text_color="white", font=("Calibri", 18, "bold"), border_width=1)
+        boton_central = ctk.CTkButton(self.frame_aula, text="Registar Aulas", width=250, height=50, fg_color="#355872", text_color="white", font=("Calibri", 18, "bold"), border_width=1, command=self.abrir_v_aula)
         boton_central.grid(row=0, column=0)
 
         self.frame_aula.grid(row=3, column=0, columnspan=2, pady=30)
@@ -184,6 +184,13 @@ class App(ctk.CTk, tk.Tk):
             self.descripcion_t.delete(0, tk.END)
             self.registrado_por_t.delete(0, tk.END)    
             self.descripcion_t.focus_set()    
+
+    def abrir_v_aula(self):
+        # self.withdraw()  # Oculta la ventana actual
+        app_aula = AppAula()  # Crea una instancia de la nueva ventana
+        app_aula.mainloop()  # Inicia el bucle de eventos de la nueva ventana
+        # self.deiconify()  # Vuelve a mostrar la ventana actual cuando se cierra la nueva ventana
+
 
     def validar_cantidad(self):
         try:

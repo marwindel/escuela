@@ -18,7 +18,7 @@ except Exception as e:
 ctk.set_appearance_mode("System")  
 ctk.set_default_color_theme("blue")
 
-class App(ctk.CTk, tk.Tk):
+class AppAula(ctk.CTk, tk.Tk):
 
     COLOR_VENTANA = "lightblue"
 
@@ -31,13 +31,12 @@ class App(ctk.CTk, tk.Tk):
         self.mostrar_formulario()
         self.mostrar_tabla()
         self.mostrar_botones()
-        self.mostrar_btn_aula()
 
 
     def configurar_ventana(self):
 
         self.title("Registrar Aulas")
-        self.geometry("800x800")
+        self.geometry("700x400")
         self.resizable(0, 0)
         self.config(bg="#9CD5FF")
 
@@ -52,7 +51,7 @@ class App(ctk.CTk, tk.Tk):
         self.columnconfigure(1, weight=1)
 
     def mostrar_titulo(self):
-        etiqueta = ctk.CTkLabel(self, text="Registrar Aulas", bg_color="#9CD5FF", font=("Calibri", 48, "bold"), text_color="black")
+        etiqueta = ctk.CTkLabel(self, text="Registrar Aulas", bg_color="#9CD5FF", font=("Calibri", 32, "bold"), text_color="black")
 
         etiqueta.grid(row=0, column=0, columnspan=2, pady=20)
 
@@ -75,7 +74,7 @@ class App(ctk.CTk, tk.Tk):
     def mostrar_tabla(self):
 
         self.frame_tabla = tk.Frame(self)
-        self.estilo.configure('Treeview', background='#355872', foreground='white', fieldbackground='#355872', rowheight=40, font=('Calibri', 12))
+        self.estilo.configure('Treeview', background='#355872', foreground='white', fieldbackground='#355872', rowheight=25, font=('Calibri', 12))
         self.estilo.configure('Treeview.Heading', background="#E1EDF7", foreground='black', font=('Calibri', 12, 'bold'))
 
         columnas = ('Id', 'Grado', 'Seccion')
@@ -83,12 +82,12 @@ class App(ctk.CTk, tk.Tk):
         self.tabla = ttk.Treeview(self.frame_tabla, columns= columnas, show='headings')
 
         self.tabla.heading('Id', text='Id', anchor=tk.CENTER)
-        self.tabla.heading('Grado', text='Grado', anchor=tk.W)
-        self.tabla.heading('Seccion', text='Seccion', anchor=tk.W)
+        self.tabla.heading('Grado', text='Grado', anchor=tk.CENTER)
+        self.tabla.heading('Seccion', text='Seccion', anchor=tk.CENTER)
 
-        self.tabla.column('Id', width=50, anchor=tk.CENTER)
-        self.tabla.column('Grado', width=80,  anchor=tk.CENTER)
-        self.tabla.column('Seccion', width=90,  anchor=tk.CENTER)
+        self.tabla.column('Id', width=150, anchor=tk.CENTER)
+        self.tabla.column('Grado', width=150,  anchor=tk.CENTER)
+        self.tabla.column('Seccion', width=150,  anchor=tk.CENTER)
 
     
 
@@ -124,19 +123,6 @@ class App(ctk.CTk, tk.Tk):
 
         self.frame_botones.grid(row=2, column=0, columnspan=2, pady=20)
     
-    def mostrar_btn_aula(self):
-        self.frame_aula = ctk.CTkFrame(self, width=300, height=200, border_width=3)
-        #self.frame_aula.pack(pady=10, padx=10, fill="both", expand=True)
-
-        self.frame_aula.grid_columnconfigure(0, weight=1)
-        self.frame_aula.grid_rowconfigure(0, weight=1)
-
-        # 3. Crear el botón y colocarlo en la posición (0,0)
-        boton_central = ctk.CTkButton(self.frame_aula, text="Registar Aulas", width=250, height=50, fg_color="#355872", text_color="white", font=("Calibri", 18, "bold"), border_width=1)
-        boton_central.grid(row=0, column=0)
-
-        self.frame_aula.grid(row=3, column=0, columnspan=2, pady=30)
-
     def validar_aulas(self):
 
         if(self.grado_t.get() and self.seccion_t.get()):
@@ -199,10 +185,16 @@ class App(ctk.CTk, tk.Tk):
             messagebox.showerror("Error", "Debes seleccionar un cliente para eliminarlo")
 
         else:
-            material = Aula(self.id_aula, None, None, None, None, None, None)
-            ClienteDAO.eliminarAula(material)
-            messagebox.showinfo("Éxito", "Aula eliminada correctamente.")
-            self.recargar_datos()
+
+            validar_aula = ClienteDAO.aulaValid(self.id_aula)
+            if validar_aula > 0:
+                messagebox.showerror("Error", "No se puede eliminar el aula porque tiene materiales asociados.")
+                return
+            else:
+                material = Aula(self.id_aula, None, None)
+                ClienteDAO.eliminarAula(material)
+                messagebox.showinfo("Éxito", "Aula eliminada correctamente.")
+                self.recargar_datos()
 
     def limpiar_datos(self):
         self.limpiar_datos_formulario()
@@ -216,5 +208,5 @@ class App(ctk.CTk, tk.Tk):
 
 
 if __name__ == "__main__":
-    app = App()
+    app = AppAula()
     app.mainloop()

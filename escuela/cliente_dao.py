@@ -6,6 +6,7 @@ from escuela.cliente import Cliente
 class ClienteDAO:
     SELECCIONAR = 'SELECT m.id, m.descripcion, m.cantidad, m.registrado_por, m.fecha_creacion, m.fecha_actualizacion, a.grado, a.seccion FROM materiales as m INNER JOIN aula as a ON (m.aula_id = a.id) ORDER BY m.id'
     SELECCIONAR_AULA = 'SELECT * FROM aula'
+    SELECCIONAR_EXISTE_AULA = 'SELECT COUNT(*) AS valor FROM materiales WHERE aula_id=%s'
     SELECT_ID = 'SELECT id FROM aula WHERE grado=%s AND seccion=%s'
     INSERTAR_MAT = 'INSERT INTO materiales(descripcion, cantidad, aula_id, registrado_por, fecha_creacion, fecha_actualizacion) VALUES(%s, %s, %s, %s, %s, %s)'
     INSERTAR_AULA = 'INSERT INTO aula(grado, seccion) VALUES(%s, %s)'
@@ -79,6 +80,23 @@ class ClienteDAO:
                 cursor.close()
                 Conexion.liberar_conexion(conexion)
 
+    @classmethod
+    def aulaValid(cls, seccion):
+        conexion = None
+        try:
+
+            conexion = Conexion.obtener_conexion()
+            cursor = conexion.cursor()
+            cursor.execute(cls.SELECCIONAR_EXISTE_AULA, [seccion])
+            registros = cursor.fetchall()
+            # Mapeo de clase-t
+            return registros[0][0]
+        except Exception as e:
+            print(f'Ocurrio un error al seleccionar aulas: {e}')
+        finally:
+            if conexion is not None:
+                cursor.close()
+                Conexion.liberar_conexion(conexion)
     @classmethod
     def insertarMat(cls, cliente):
         conexion = None
