@@ -1,0 +1,220 @@
+from datetime import datetime
+
+import customtkinter as ctk
+#from customtkinter import messagebox
+import tkinter as tk
+from tkinter import ttk
+from tkinter import messagebox
+from escuela.cliente_dao import ClienteDAO
+from escuela.materiales import Materiales
+from escuela.aula import Aula
+import ctypes 
+
+try:
+    ctypes.windll.shcore.SetProcessDpiAwareness(1)
+except Exception as e:
+    print(f"No se pudo ajustar el DPI: {e}")
+
+ctk.set_appearance_mode("System")  
+ctk.set_default_color_theme("blue")
+
+class App(ctk.CTk, tk.Tk):
+
+    COLOR_VENTANA = "lightblue"
+
+    def __init__(self):
+        super().__init__()
+        self.id_aula = None
+        self.configurar_ventana()
+        self.configurar_grid()
+        self.mostrar_titulo()
+        self.mostrar_formulario()
+        self.mostrar_tabla()
+        self.mostrar_botones()
+        self.mostrar_btn_aula()
+
+
+    def configurar_ventana(self):
+
+        self.title("Registrar Aulas")
+        self.geometry("800x800")
+        self.resizable(0, 0)
+        self.config(bg="#9CD5FF")
+
+        self.estilo = ttk.Style()
+        self.estilo.theme_use("clam")
+        self.estilo.configure(self, background="#9CD5FF",
+                              foreground="black", font=("Arial", 12))
+
+
+    def configurar_grid(self):
+        self.columnconfigure(0, weight=1)
+        self.columnconfigure(1, weight=1)
+
+    def mostrar_titulo(self):
+        etiqueta = ctk.CTkLabel(self, text="Registrar Aulas", bg_color="#9CD5FF", font=("Calibri", 48, "bold"), text_color="black")
+
+        etiqueta.grid(row=0, column=0, columnspan=2, pady=20)
+
+    def mostrar_formulario(self):
+        
+        self.frame_forma = tk.Frame(self, bg="#9CD5FF")
+
+        grado = ctk.CTkLabel(self.frame_forma, text="Grado:", font=("Calibri", 18, "bold"), text_color="black")
+        grado.grid(row=0, column=0, sticky=ctk.W, pady=20, padx=5)
+        self.grado_t =ctk.CTkEntry(self.frame_forma)
+        self.grado_t.grid(row=0, column=1)
+
+        seccion = ctk.CTkLabel(self.frame_forma, text="Seccion:", font=("Calibri", 18, "bold"), text_color="black")
+        seccion.grid(row=1, column=0, sticky=ctk.W, pady=20, padx=5)
+        self.seccion_t =ctk.CTkEntry(self.frame_forma)
+        self.seccion_t.grid(row=1, column=1)
+
+        self.frame_forma.grid(row=1, column=0)
+
+    def mostrar_tabla(self):
+
+        self.frame_tabla = tk.Frame(self)
+        self.estilo.configure('Treeview', background='#355872', foreground='white', fieldbackground='#355872', rowheight=40, font=('Calibri', 12))
+        self.estilo.configure('Treeview.Heading', background="#E1EDF7", foreground='black', font=('Calibri', 12, 'bold'))
+
+        columnas = ('Id', 'Grado', 'Seccion')
+
+        self.tabla = ttk.Treeview(self.frame_tabla, columns= columnas, show='headings')
+
+        self.tabla.heading('Id', text='Id', anchor=tk.CENTER)
+        self.tabla.heading('Grado', text='Grado', anchor=tk.W)
+        self.tabla.heading('Seccion', text='Seccion', anchor=tk.W)
+
+        self.tabla.column('Id', width=50, anchor=tk.CENTER)
+        self.tabla.column('Grado', width=80,  anchor=tk.CENTER)
+        self.tabla.column('Seccion', width=90,  anchor=tk.CENTER)
+
+    
+
+        aulas = ClienteDAO.seleccionarAula()
+
+        for cliente in aulas:
+            self.tabla.insert(parent='', index=tk.END, values=(cliente.id, cliente.grado, cliente.seccion))
+
+
+        scrollbar = ttk.Scrollbar(self.frame_tabla, orient=tk.VERTICAL, command=self.tabla.yview)
+
+        self.tabla.configure(yscroll=scrollbar.set)
+        scrollbar.grid(row=0, column=1, sticky=tk.NS)
+
+        self.tabla.bind('<<TreeviewSelect>>', self.seleccionar_aula)
+
+
+        self.tabla.grid(row=0, column=0)
+
+        self.frame_tabla.grid(row=1, column=1, padx=20, pady=20)
+
+    def mostrar_botones(self):
+        self.frame_botones = tk.Frame(self, bg="#9CD5FF")
+
+        insertar_btn = ctk.CTkButton(self.frame_botones, text="Guardar", fg_color="#51D465", text_color="black", font=("Calibri", 18, "bold"), border_width=1, command=self.validar_aulas)
+        insertar_btn.grid(row=0, column=0, padx=10)
+
+        actualizar_btn = ctk.CTkButton(self.frame_botones, text="Limpiar", fg_color="#E6EBE8", text_color="black", font=("Calibri", 18, "bold"), border_width=1, command=self.limpiar_datos)
+        actualizar_btn.grid(row=0, column=1, padx=10)
+
+        eliminar_btn = ctk.CTkButton(self.frame_botones, text="Eliminar", fg_color="#AD3131", text_color="white", font=("Calibri", 18, "bold"), border_width=1, command=self.eliminar_aula)
+        eliminar_btn.grid(row=0, column=2, padx=10)
+
+        self.frame_botones.grid(row=2, column=0, columnspan=2, pady=20)
+    
+    def mostrar_btn_aula(self):
+        self.frame_aula = ctk.CTkFrame(self, width=300, height=200, border_width=3)
+        #self.frame_aula.pack(pady=10, padx=10, fill="both", expand=True)
+
+        self.frame_aula.grid_columnconfigure(0, weight=1)
+        self.frame_aula.grid_rowconfigure(0, weight=1)
+
+        # 3. Crear el botón y colocarlo en la posición (0,0)
+        boton_central = ctk.CTkButton(self.frame_aula, text="Registar Aulas", width=250, height=50, fg_color="#355872", text_color="white", font=("Calibri", 18, "bold"), border_width=1)
+        boton_central.grid(row=0, column=0)
+
+        self.frame_aula.grid(row=3, column=0, columnspan=2, pady=30)
+
+    def validar_aulas(self):
+
+        if(self.grado_t.get() and self.seccion_t.get()):
+            if self.validar_cantidad():
+                self.guardar_aula()
+            else:
+                messagebox.showerror("Error", "El valor debe ser un número.")
+                self.grado_t.delete(0, tk.END)
+                self.grado_t.focus_set()
+        else:
+            messagebox.showerror("Error", "Todos los campos son obligatorios.")
+            self.grado_t.delete(0, tk.END)
+            self.seccion_t.delete(0, tk.END) 
+            self.grado_t.focus_set()    
+
+    def validar_cantidad(self):
+        try:
+            int(self.grado_t.get())
+            return True
+
+        except ValueError:
+            print("El grado debe ser un número.")
+            return False
+
+    def guardar_aula(self):
+        grado = self.grado_t.get()
+        seccion = self.seccion_t.get()
+
+        if self.id_aula is None:
+
+            materiales = Aula(None, grado, seccion)
+            ClienteDAO.insertarAula(materiales)
+            messagebox.showinfo("Éxito", "Aula guardada correctamente.")
+
+
+        self.recargar_datos()
+
+    def seleccionar_aula(self, event):
+        item_seleccionado = self.tabla.selection()[0]
+        elemento = self.tabla.item(item_seleccionado)
+        material = elemento['values']
+
+        self.id_aula = material[0]
+        grado_t = material[1]
+        seccion_t = material[2]
+
+
+        self.limpiar_datos_formulario()
+
+        self.grado_t.insert(0, grado_t)
+        self.seccion_t.insert(0, seccion_t)
+
+    def recargar_datos(self):
+        self.mostrar_tabla()
+
+        self.limpiar_datos()
+
+    def eliminar_aula(self):
+        if self.id_aula is None:
+            messagebox.showerror("Error", "Debes seleccionar un cliente para eliminarlo")
+
+        else:
+            material = Aula(self.id_aula, None, None, None, None, None, None)
+            ClienteDAO.eliminarAula(material)
+            messagebox.showinfo("Éxito", "Aula eliminada correctamente.")
+            self.recargar_datos()
+
+    def limpiar_datos(self):
+        self.limpiar_datos_formulario()
+        self.id_aula = None
+
+    def limpiar_datos_formulario(self):
+        self.grado_t.delete(0, tk.END)
+        self.seccion_t.delete(0, tk.END)   
+        self.grado_t.focus_set()
+
+
+
+if __name__ == "__main__":
+    app = App()
+    app.mainloop()
