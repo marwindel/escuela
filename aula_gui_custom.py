@@ -15,10 +15,12 @@ try:
 except Exception as e:
     print(f"No se pudo ajustar el DPI: {e}")
 
-ctk.set_appearance_mode("System")  
-ctk.set_default_color_theme("blue")
+
 
 class AppAula(ctk.CTk, tk.Tk):
+
+    ctk.set_appearance_mode("System")  
+    ctk.set_default_color_theme("blue")
 
     COLOR_VENTANA = "lightblue"
 
@@ -93,8 +95,11 @@ class AppAula(ctk.CTk, tk.Tk):
 
         aulas = ClienteDAO.seleccionarAula()
 
-        for cliente in aulas:
-            self.tabla.insert(parent='', index=tk.END, values=(cliente.id, cliente.grado, cliente.seccion))
+        if not aulas:
+            self.tabla.insert(parent='', index=tk.END, values=("(vacio)", "(vacio)", "(vacio)"))
+        else: 
+            for cliente in aulas:
+                self.tabla.insert(parent='', index=tk.END, values=(cliente.id, cliente.grado, cliente.seccion))
 
 
         scrollbar = ttk.Scrollbar(self.frame_tabla, orient=tk.VERTICAL, command=self.tabla.yview)

@@ -36,7 +36,7 @@ class App(ctk.CTk, tk.Tk):
     def configurar_ventana(self):
 
         self.title("Proyecto Escuela")
-        self.geometry("1300x600")
+        self.geometry("1300x750")
         self.resizable(0, 0)
         self.config(bg="#9CD5FF")
 
@@ -122,7 +122,10 @@ class App(ctk.CTk, tk.Tk):
 
         clientes = ClienteDAO.seleccionar()
 
-        for cliente in clientes:
+        if not clientes:
+          self.tabla.insert(parent='', index=tk.END, values=("(vacio)", "(vacio)", "(vacio)", "(vacio)", "(vacio)", "(vacio)", "(vacio)", "(vacio)"))
+        else:
+          for cliente in clientes:
             self.tabla.insert(parent='', index=tk.END, values=(cliente.id, cliente.descripcion, cliente.cantidad, cliente.registrado_por, cliente.fecha_creacion, cliente.fecha_actualizacion, cliente.grado, cliente.seccion))
 
 
