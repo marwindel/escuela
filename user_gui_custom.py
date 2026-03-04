@@ -53,7 +53,7 @@ class AppAula(ctk.CTk, tk.Tk):
         self.columnconfigure(1, weight=1)
 
     def mostrar_titulo(self):
-        etiqueta = ctk.CTkLabel(self, text="Registrar Aulas", bg_color="#9CD5FF", font=("Calibri", 32, "bold"), text_color="black")
+        etiqueta = ctk.CTkLabel(self, text="Administrar Usuarios", bg_color="#9CD5FF", font=("Calibri", 32, "bold"), text_color="black")
 
         etiqueta.grid(row=0, column=0, columnspan=2, pady=20)
 
@@ -61,15 +61,25 @@ class AppAula(ctk.CTk, tk.Tk):
         
         self.frame_forma = tk.Frame(self, bg="#9CD5FF")
 
-        grado = ctk.CTkLabel(self.frame_forma, text="Grado:", font=("Calibri", 18, "bold"), text_color="black")
-        grado.grid(row=0, column=0, sticky=ctk.W, pady=20, padx=5)
-        self.grado_t =ctk.CTkEntry(self.frame_forma)
-        self.grado_t.grid(row=0, column=1)
+        nombre = ctk.CTkLabel(self.frame_forma, text="Nombre y Apellido:", font=("Calibri", 18, "bold"), text_color="black")
+        nombre.grid(row=0, column=0, sticky=ctk.W, pady=20, padx=5)
+        self.nombre_t =ctk.CTkEntry(self.frame_forma)
+        self.nombre_t.grid(row=0, column=1)
 
-        seccion = ctk.CTkLabel(self.frame_forma, text="Seccion:", font=("Calibri", 18, "bold"), text_color="black")
-        seccion.grid(row=1, column=0, sticky=ctk.W, pady=20, padx=5)
-        self.seccion_t =ctk.CTkEntry(self.frame_forma)
-        self.seccion_t.grid(row=1, column=1)
+        usuario = ctk.CTkLabel(self.frame_forma, text="Usuario:", font=("Calibri", 18, "bold"), text_color="black")
+        usuario.grid(row=1, column=0, sticky=ctk.W, pady=20, padx=5)
+        self.usuario_t =ctk.CTkEntry(self.frame_forma)
+        self.usuario_t.grid(row=1, column=1)
+
+        clave = ctk.CTkLabel(self.frame_forma, text="Contraseña:", font=("Calibri", 18, "bold"), text_color="black")
+        clave.grid(row=2, column=0, sticky=ctk.W, pady=20, padx=5)
+        self.clave_t =ctk.CTkEntry(self.frame_forma)
+        self.clave_t.grid(row=2, column=1)
+
+        clave2 = ctk.CTkLabel(self.frame_forma, text="Confirmar Contraseña:", font=("Calibri", 18, "bold"), text_color="black")
+        clave2.grid(row=3, column=0, sticky=ctk.W, pady=20, padx=5)
+        self.clave2_t =ctk.CTkEntry(self.frame_forma)
+        self.clave2_t.grid(row=3, column=1)
 
         self.frame_forma.grid(row=1, column=0)
 
@@ -79,27 +89,29 @@ class AppAula(ctk.CTk, tk.Tk):
         self.estilo.configure('Treeview', background='#355872', foreground='white', fieldbackground='#355872', rowheight=25, font=('Calibri', 12))
         self.estilo.configure('Treeview.Heading', background="#E1EDF7", foreground='black', font=('Calibri', 12, 'bold'))
 
-        columnas = ('Id', 'Grado', 'Seccion')
+        columnas = ('Id', 'Nombre', 'Usuario', 'Contraseña')
 
         self.tabla = ttk.Treeview(self.frame_tabla, columns= columnas, show='headings')
 
         self.tabla.heading('Id', text='Id', anchor=tk.CENTER)
-        self.tabla.heading('Grado', text='Grado', anchor=tk.CENTER)
-        self.tabla.heading('Seccion', text='Seccion', anchor=tk.CENTER)
-
+        self.tabla.heading('Nombre', text='Nombre', anchor=tk.CENTER)
+        self.tabla.heading('Usuario', text='Usuario', anchor=tk.CENTER)
+        self.tabla.heading('Contraseña', text='Contraseña', anchor=tk.CENTER)
+    
         self.tabla.column('Id', width=150, anchor=tk.CENTER)
-        self.tabla.column('Grado', width=150,  anchor=tk.CENTER)
-        self.tabla.column('Seccion', width=150,  anchor=tk.CENTER)
+        self.tabla.column('Nombre', width=150,  anchor=tk.CENTER)
+        self.tabla.column('Usuario', width=150,  anchor=tk.CENTER)
+        self.tabla.column('Contraseña', width=150,  anchor=tk.CENTER)
 
     
 
-        aulas = ClienteDAO.seleccionarAula()
+        usuario = ClienteDAO.seleccionarUsuario()
 
-        if not aulas:
-            self.tabla.insert(parent='', index=tk.END, values=("(vacio)", "(vacio)", "(vacio)"))
+        if not usuario:
+            self.tabla.insert(parent='', index=tk.END, values=("(vacio)", "(vacio)", "(vacio)", "(vacio)"))
         else: 
-            for cliente in aulas:
-                self.tabla.insert(parent='', index=tk.END, values=(cliente.id, cliente.grado, cliente.seccion))
+            for cliente in usuario:
+                self.tabla.insert(parent='', index=tk.END, values=(cliente.id, cliente.nombre, cliente.usuario, cliente.clave))
 
 
         scrollbar = ttk.Scrollbar(self.frame_tabla, orient=tk.VERTICAL, command=self.tabla.yview)
@@ -117,7 +129,7 @@ class AppAula(ctk.CTk, tk.Tk):
     def mostrar_botones(self):
         self.frame_botones = tk.Frame(self, bg="#9CD5FF")
 
-        insertar_btn = ctk.CTkButton(self.frame_botones, text="Guardar", fg_color="#51D465", text_color="black", font=("Calibri", 18, "bold"), border_width=1, command=self.validar_aulas)
+        insertar_btn = ctk.CTkButton(self.frame_botones, text="Guardar", fg_color="#51D465", text_color="black", font=("Calibri", 18, "bold"), border_width=1, command=self.validar_user)
         insertar_btn.grid(row=0, column=0, padx=10)
 
         actualizar_btn = ctk.CTkButton(self.frame_botones, text="Limpiar", fg_color="#E6EBE8", text_color="black", font=("Calibri", 18, "bold"), border_width=1, command=self.limpiar_datos)
@@ -128,20 +140,33 @@ class AppAula(ctk.CTk, tk.Tk):
 
         self.frame_botones.grid(row=2, column=0, columnspan=2, pady=20)
     
-    def validar_aulas(self):
+    def validar_user(self):
 
-        if(self.grado_t.get() and self.seccion_t.get()):
-            if self.validar_cantidad():
-                self.guardar_aula()
+        if(self.nombre_t.get() and self.usuario_t.get()):
+
+
+            if self.clave_t.get() and self.clave2_t.get():
+
+                if self.clave_t.get() == self.clave2_t.get():
+
+                    self.guardar_user()
+
+                else:
+                    messagebox.showerror("Error", "Las contraseñas no coinciden.")
+                    self.clave_t.delete(0, tk.END)
+                    self.clave2_t.delete(0, tk.END)
+                    self.clave_t.focus_set()
             else:
-                messagebox.showerror("Error", "El valor debe ser un número.")
-                self.grado_t.delete(0, tk.END)
-                self.grado_t.focus_set()
+                
+                self.actualizar_user()
+
         else:
             messagebox.showerror("Error", "Todos los campos son obligatorios.")
-            self.grado_t.delete(0, tk.END)
-            self.seccion_t.delete(0, tk.END) 
-            self.grado_t.focus_set()    
+            self.nombre_t.delete(0, tk.END)
+            self.usuario_t.delete(0, tk.END)
+            self.clave_t.delete(0, tk.END)
+            self.clave2_t.delete(0, tk.END)
+            self.nombre_t.focus_set()
 
     def validar_cantidad(self):
         try:

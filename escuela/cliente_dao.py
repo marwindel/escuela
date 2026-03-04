@@ -1,6 +1,7 @@
 from escuela.aula import Aula
 from escuela.conexion import Conexion
 from escuela.cliente import Cliente
+from escuela.usuario import Usuario
 import bcrypt
 
 
@@ -12,6 +13,9 @@ class ClienteDAO:
     SELECT_ID = 'SELECT id FROM aula WHERE grado=%s AND seccion=%s'
     INSERTAR_MAT = 'INSERT INTO materiales(descripcion, cantidad, aula_id, registrado_por, fecha_creacion, fecha_actualizacion) VALUES(%s, %s, %s, %s, %s, %s)'
     INSERTAR_AULA = 'INSERT INTO aula(grado, seccion) VALUES(%s, %s)'
+    INSERTAR_USUARIO = 'INSERT INTO usuario(username, nombre, password) VALUES(%s, %s, %s)'
+
+
     ACTUALIZAR = 'UPDATE materiales SET descripcion=%s, cantidad=%s, aula_id=%s, fecha_actualizacion=%s WHERE id=%s'
     ELIMINAR_MAT = 'DELETE FROM materiales WHERE id=%s'
     ELIMINAR_AULA = 'DELETE FROM aula WHERE id=%s'
@@ -30,7 +34,7 @@ class ClienteDAO:
 
             if registros:
 
-                password_hash = registros[2]
+                password_hash = registros[3]
                  # Asumiendo que tu tabla tiene una columna 'password'
                 if bcrypt.checkpw(password.encode('utf-8'), password_hash.encode('utf-8')):
                     return True
@@ -41,6 +45,31 @@ class ClienteDAO:
             
         except Exception as e:
             print(f'Ocurrio un error al seleccionar clientes: {e}')
+        finally:
+            if conexion is not None:
+                cursor.close()
+                Conexion.liberar_conexion(conexion)
+
+    @classmethod
+    def seleccionarUsuario(cls):
+        conexion = None
+        try:
+
+            conexion = Conexion.obtener_conexion()
+            cursor = conexion.cursor()
+            query = f"SELECT * FROM usuario"
+            cursor.execute(query)
+            registros = cursor.fetchall()
+            # Mapeo de clase-tabla cliente
+            usuarios = []
+            for registro in registros:
+                user = Usuario(registro[0], registro[1],
+                                  registro[2], registro[3], registro[4])
+                usuarios.append(user)
+            return usuarios
+            
+        except Exception as e:
+            print(f'Ocurrio un error al seleccionar usuarios: {e}')
         finally:
             if conexion is not None:
                 cursor.close()
@@ -158,6 +187,25 @@ class ClienteDAO:
             return cursor.rowcount
         except Exception as e:
             print(f'Ocurrio un error al insertar un Aula: {e}')
+        finally:
+            if conexion is not None:
+                cursor.close()
+                Conexion.liberar_conexion(conexion)
+    
+    @classmethod
+    def insertarUsuario(cls, usuario):
+        conexion = None
+        try:
+
+            clave_encrytada = bcrypt.hashpw(usuario.clave.encode('utf-8'), bcrypt.gensalt(rounds=10))
+            conexion = Conexion.obtener_conexion()
+            cursor = conexion.cursor()
+            valores = (usuario.nombre, usuario.usuario, clave_encrytada)
+            cursor.execute(cls.INSERTAR_USUARIO, valores)
+            conexion.commit()
+            return cursor.rowcount
+        except Exception as e:
+            print(f'Ocurrio un error al insertar un Usuario: {e}')
         finally:
             if conexion is not None:
                 cursor.close()
