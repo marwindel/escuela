@@ -1,18 +1,50 @@
 from escuela.aula import Aula
 from escuela.conexion import Conexion
 from escuela.cliente import Cliente
+import bcrypt
 
 
 class ClienteDAO:
     SELECCIONAR = 'SELECT m.id, m.descripcion, m.cantidad, m.registrado_por, m.fecha_creacion, m.fecha_actualizacion, a.grado, a.seccion FROM materiales as m INNER JOIN aula as a ON (m.aula_id = a.id) ORDER BY m.id'
     SELECCIONAR_AULA = 'SELECT * FROM aula'
     SELECCIONAR_EXISTE_AULA = 'SELECT COUNT(*) AS valor FROM materiales WHERE aula_id=%s'
+
     SELECT_ID = 'SELECT id FROM aula WHERE grado=%s AND seccion=%s'
     INSERTAR_MAT = 'INSERT INTO materiales(descripcion, cantidad, aula_id, registrado_por, fecha_creacion, fecha_actualizacion) VALUES(%s, %s, %s, %s, %s, %s)'
     INSERTAR_AULA = 'INSERT INTO aula(grado, seccion) VALUES(%s, %s)'
     ACTUALIZAR = 'UPDATE materiales SET descripcion=%s, cantidad=%s, aula_id=%s, fecha_actualizacion=%s WHERE id=%s'
     ELIMINAR_MAT = 'DELETE FROM materiales WHERE id=%s'
     ELIMINAR_AULA = 'DELETE FROM aula WHERE id=%s'
+
+    @classmethod
+    def login(cls, username, password):
+        conexion = None
+        try:
+
+            conexion = Conexion.obtener_conexion()
+            cursor = conexion.cursor()
+            query = f"SELECT * FROM usuario WHERE username ='{username}'"
+            cursor.execute(query)
+            registros = cursor.fetchone()
+            # Mapeo de clase-tabla cliente
+
+            if registros:
+
+                password_hash = registros[2]
+                 # Asumiendo que tu tabla tiene una columna 'password'
+                if bcrypt.checkpw(password.encode('utf-8'), password_hash.encode('utf-8')):
+                    return True
+                else:
+                    return False
+            else:
+                return False
+            
+        except Exception as e:
+            print(f'Ocurrio un error al seleccionar clientes: {e}')
+        finally:
+            if conexion is not None:
+                cursor.close()
+                Conexion.liberar_conexion(conexion)
 
     @classmethod
     def seleccionar(cls):

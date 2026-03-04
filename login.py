@@ -1,7 +1,7 @@
 import customtkinter as ctk
 import tkinter as tk
 from tkinter import messagebox
-import bcrypt
+from escuela.cliente_dao import ClienteDAO
 from escuela_gui_custom import App
 from tkinter import messagebox
 
@@ -45,17 +45,21 @@ class LoginApp(ctk.CTk):
         user = self.entry_user.get()
         password = self.entry_pass.get()
 
-        btn_login = ctk.CTkButton(self.login_frame, text="Entrar", width=220, command=lambda: self.autenticacion(user, password))
+        btn_login = ctk.CTkButton(self.login_frame, text="Entrar", width=220, command= lambda: self.autenticacion())
         btn_login.pack(pady=40)
     
-    def autenticacion(self, email, password):
+    def autenticacion(self):
         user = self.entry_user.get()
         password = self.entry_pass.get()
 
-      # print(f"Intentando login con email: {user} y password: {password}")
+        aprovado = ClienteDAO.login(user, password)
 
-        if self.validar_login(user, password):
+        if aprovado:
             
+            self.quit()
+
+            self.destroy()
+
             app_p = App()
             app_p.mainloop()
         else:
