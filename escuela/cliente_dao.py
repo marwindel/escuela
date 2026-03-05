@@ -197,7 +197,10 @@ class ClienteDAO:
         conexion = None
         try:
 
-            clave_encrytada = bcrypt.hashpw(usuario.clave.encode('utf-8'), bcrypt.gensalt(rounds=10))
+            # Generamos un 'salt' y hasheamos
+            salt = bcrypt.gensalt()
+     
+            clave_encrytada = bcrypt.hashpw(usuario.clave.encode('utf-8'), salt)
             conexion = Conexion.obtener_conexion()
             cursor = conexion.cursor()
             valores = (usuario.nombre, usuario.usuario, clave_encrytada)
