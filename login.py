@@ -1,8 +1,8 @@
 import customtkinter as ctk
 import tkinter as tk
 from tkinter import messagebox
-from escuela.cliente_dao import ClienteDAO
-from escuela_gui_custom import App
+from data.cliente_dao import ClienteDAO
+from MainView import MiApp
 from tkinter import messagebox
 
 class LoginApp(ctk.CTk):
@@ -54,16 +54,17 @@ class LoginApp(ctk.CTk):
 
         aprovado = ClienteDAO.login(user, password)
 
-        if aprovado:
+        if aprovado == 0:
             
+            messagebox.showerror("Error de Login", "Usuario o clave incorrectos.")
+            
+        else:
             self.quit()
 
             self.destroy()
 
-            app_p = App()
+            app_p = MiApp(aprovado)
             app_p.mainloop()
-        else:
-            messagebox.showerror("Error de Login", "Usuario o clave incorrectos.")
     
     def validar_login(self, email, password):
         
@@ -72,6 +73,8 @@ class LoginApp(ctk.CTk):
             return True
         else:
             return False
+
+
 
 
 if __name__ == "__main__":
