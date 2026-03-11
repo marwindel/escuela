@@ -13,7 +13,8 @@ class LoginApp(ctk.CTk):
     
     def __init__(self):
         super().__init__()
-        self.mostrar_login() # Temas: "blue" (estándar), "green", "dark-blue"
+        self.mostrar_login()
+        # Temas: "blue" (estándar), "green", "dark-blue"
 
     def mostrar_login(self):    # 2. Crear la ventana principal
       #  app = ctk.CTk()
@@ -42,11 +43,12 @@ class LoginApp(ctk.CTk):
         self.entry_pass = ctk.CTkEntry(self.login_frame, placeholder_text="Contraseña", show="*", width=220)
         self.entry_pass.pack(pady=12, padx=70)
 
-        user = self.entry_user.get()
-        password = self.entry_pass.get()
-
         btn_login = ctk.CTkButton(self.login_frame, text="Entrar", width=220, command= lambda: self.autenticacion())
         btn_login.pack(pady=40)
+
+        self.entry_user.focus() 
+
+        self.bind('<Return>', lambda event: self.autenticacion())
     
     def autenticacion(self):
         user = self.entry_user.get()

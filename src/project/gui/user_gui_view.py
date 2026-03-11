@@ -22,7 +22,7 @@ class VentanaUsuario(ctk.CTkFrame):
 
     COLOR_VENTANA = "lightblue"
 
-    def __init__(self, master, **kwargs ):
+    def __init__(self, master, id_user, **kwargs ):
         super().__init__(master, **kwargs)
         self.id_user = None
         self.configurar_ventana()

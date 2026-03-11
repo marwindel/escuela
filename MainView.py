@@ -3,6 +3,7 @@ from src.project.gui.aula_gui_custom import AppAula
 from src.project.gui.escuela_gui_custom import App
 from src.project.gui.user_gui_custom import AppUser
 from src.project.gui.user_gui_view import VentanaUsuario
+from src.project.gui.escuela_gui_view import VentanaMateriales
 from src.project.gui.grid import Ventana
 
 class MiApp(ctk.CTk):
@@ -35,7 +36,7 @@ class MiApp(ctk.CTk):
         self.btn_2 = ctk.CTkButton(self.sidebar, text="Aula", fg_color="#355872", hover_color="#538CB2", command=self.abrir_v_aula)
         self.btn_2.pack(pady=10, padx=20)
 
-        self.btn_3 = ctk.CTkButton(self.sidebar, text="Materiales", fg_color="#355872", hover_color="#538CB2", command=self.abrir_v_materiales)
+        self.btn_3 = ctk.CTkButton(self.sidebar, text="Materiales", fg_color="#355872", hover_color="#538CB2", command=lambda: self.abrir_v(VentanaMateriales))
         self.btn_3.pack(pady=10, padx=20)
 
         self.btn_4 = ctk.CTkButton(self.sidebar, text="prueba", fg_color="#355872", hover_color="#538CB2", command=lambda: self.abrir_v(Ventana))
@@ -57,7 +58,7 @@ class MiApp(ctk.CTk):
             self.frame_actual.destroy()
 
         # 2. Instanciar el nuevo frame dentro del contenedor
-        self.frame_actual = clase_frame(master=self.main_panel)
+        self.frame_actual = clase_frame(master=self.main_panel, id_user=self.id_user)
         
         # 3. Empaquetarlo para que ocupe todo el espacio
         self.frame_actual.pack(fill="both", expand=True)
@@ -80,7 +81,7 @@ class MiApp(ctk.CTk):
 
 
                 # self.withdraw()  # Oculta la ventana actual
-        app_aula = App(self.id_user)  # Crea una instancia de la nueva ventana
+        app_aula = App()  # Crea una instancia de la nueva ventana
         app_aula.mainloop()  # Inicia el bucle de eventos de la nueva ventana
         # self.deiconify()  # Vuelve a mostrar la ventana actual cuando se cierra la nueva ventana
 
