@@ -4,6 +4,7 @@ from src.project.gui.escuela_gui_custom import App
 from src.project.gui.user_gui_custom import AppUser
 from src.project.gui.user_gui_view import VentanaUsuario
 from src.project.gui.escuela_gui_view import VentanaMateriales
+from src.project.gui.aula_gui_view import VentanaAula
 from src.project.gui.grid import Ventana
 
 class MiApp(ctk.CTk):
@@ -33,7 +34,7 @@ class MiApp(ctk.CTk):
         self.btn_1 = ctk.CTkButton(self.sidebar, text="Usuario", fg_color="#355872", hover_color="#538CB2", command=lambda: self.abrir_v(VentanaUsuario))
         self.btn_1.pack(pady=10, padx=20)
 
-        self.btn_2 = ctk.CTkButton(self.sidebar, text="Aula", fg_color="#355872", hover_color="#538CB2", command=self.abrir_v_aula)
+        self.btn_2 = ctk.CTkButton(self.sidebar, text="Aula", fg_color="#355872", hover_color="#538CB2", command=lambda: self.abrir_v(VentanaAula))
         self.btn_2.pack(pady=10, padx=20)
 
         self.btn_3 = ctk.CTkButton(self.sidebar, text="Materiales", fg_color="#355872", hover_color="#538CB2", command=lambda: self.abrir_v(VentanaMateriales))
